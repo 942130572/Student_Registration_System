@@ -1,10 +1,9 @@
 /*
- * @author À×ºÆ½à
+ * @author é›·æµ©æ´
  * @version 1.0
- * ½ÌÊÚ¿Í»§¶Ë´úÂë
+ * æ•™æˆå®¢æˆ·ç«¯ä»£ç 
  */
 package Login;
-
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -22,76 +21,80 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-public class Prof_GUI extends JFrame implements ActionListener{
+public class Prof_GUI extends JFrame implements ActionListener {
 	public int sys_width;
 	public int sys_height;
 	public int windowsWidth;
 	public int windowsHeight;
-	
-	public String user_id;//½ÌÊÚÓÃ»§Ãû£¬¼´½Ì¹¤ºÅ
-	public String password;//½ÌÊÚÃÜÂë
-	
-	private JButton jb1;//¸ºÔğÆô¶¯½ÌÊÚµÄÁ½¸öÓÃÀı£ºÑ¡ÔñÖ´½Ì¿Î³ÌÓëÌá½»³É¼¨
+
+	public String user_id;// æ•™æˆç”¨æˆ·åï¼Œå³æ•™å·¥å·
+	public String password;// æ•™æˆå¯†ç 
+
+	private JButton jb1;// è´Ÿè´£å¯åŠ¨æ•™æˆçš„ä¸¤ä¸ªç”¨ä¾‹ï¼šé€‰æ‹©æ‰§æ•™è¯¾ç¨‹ä¸æäº¤æˆç»©
 	private JButton jb2;
 	private JPanel jp;
 	private JLabel title;
-	
-	//¸ºÔğÓë·şÎñÆ÷Í¨ĞÅµÄsocket£¬ÒÑÔÚ¹¹Ôìº¯ÊıÖĞ³õÊ¼»¯
+
+	// è´Ÿè´£ä¸æœåŠ¡å™¨é€šä¿¡çš„socketï¼Œå·²åœ¨æ„é€ å‡½æ•°ä¸­åˆå§‹åŒ–
 	public Socket socket;
 	public DataInputStream dis;
 	public DataOutputStream dos;
-	
-	public Prof_GUI(String name, String pw,Socket socket) {
+
+	public Prof_GUI(String name, String pw, Socket socket) {
 		this.user_id = name;
 		this.password = pw;
-		this.socket=socket;
+		this.socket = socket;
 		try {
-			this.dis = new DataInputStream(
-			        new BufferedInputStream(socket.getInputStream()));
-			this.dos = new DataOutputStream(
-	                new BufferedOutputStream(socket.getOutputStream()));
+			this.dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+			this.dos = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 		} catch (IOException e) {
-			// TODO ×Ô¶¯Éú³ÉµÄ catch ¿é
+			// TODO è‡ªåŠ¨ç”Ÿæˆçš„ catch å—
 			e.printStackTrace();
 		}
-		this.setTitle("½ÌÊÚÑ¡¿ÎÏµÍ³");
-		
-		//ÉèÖÃ´°¿Ú´óĞ¡
+		this.setTitle("æ•™æˆé€‰è¯¾ç³»ç»Ÿ");
+
+		// è®¾ç½®çª—å£å¤§å°
 		sys_width = Toolkit.getDefaultToolkit().getScreenSize().width;
-	    sys_height = Toolkit.getDefaultToolkit().getScreenSize().height;
-	    windowsWidth = 350;
-	    windowsHeight = 350;
-	    this.setSize(windowsWidth,windowsHeight);
-	    this.setBounds((sys_width- windowsWidth) / 2,
-                (sys_height - windowsHeight) / 2, windowsWidth, windowsHeight);
-		
-	    //²¼¾Ö
-	    this.setLayout(new GridLayout(2,1));
-	    
-	    //»¶Ó­Óï
-	    title = new JLabel("»¶Ó­Ê¹ÓÃÑ¡¿ÎÏµÍ³£¡",JLabel.CENTER);
-	    this.add(title);
-	    
-	    //Á½¸ö¹¦ÄÜ
-	    jb1 = new JButton("Ñ¡ÔñÖ´½Ì¿Î³Ì");
-	    jb2 = new JButton("Ìá½»³É¼¨");
-	    jb1.addActionListener(this);
-	    jb2.addActionListener(this);
-	    jp = new JPanel();
-	    jp.setLayout(new GridLayout(1,2));
-	    jp.add(jb1);
-	    jp.add(jb2);
-	    this.add(jp);
-	    
-	    this.setVisible(true);
+		sys_height = Toolkit.getDefaultToolkit().getScreenSize().height;
+		windowsWidth = 350;
+		windowsHeight = 350;
+		this.setSize(windowsWidth, windowsHeight);
+		this.setBounds((sys_width - windowsWidth) / 2, (sys_height - windowsHeight) / 2, windowsWidth, windowsHeight);
+
+		// å¸ƒå±€
+		this.setLayout(new GridLayout(2, 1));
+
+		// æ¬¢è¿è¯­
+		title = new JLabel("æ¬¢è¿ä½¿ç”¨é€‰è¯¾ç³»ç»Ÿï¼", JLabel.CENTER);
+		this.add(title);
+
+		// ä¸¤ä¸ªåŠŸèƒ½
+		jb1 = new JButton("é€‰æ‹©æ‰§æ•™è¯¾ç¨‹");
+		jb2 = new JButton("æäº¤æˆç»©");
+		jb1.addActionListener(this);
+		jb2.addActionListener(this);
+		jp = new JPanel();
+		jp.setLayout(new GridLayout(1, 2));
+		jp.add(jb1);
+		jp.add(jb2);
+		this.add(jp);
+
+		this.setVisible(true);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
-	
+
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource()==jb1) {  //Ñ¡ÔñÖ´½Ì¿Î³Ì¹¦ÄÜ
-			//²¹³ä£ºÖ´ĞĞÑ¡ÔñÖ´½Ì¿Î³ÌÓÃÀı
-		}else if(e.getSource()==jb2) {  //Ìá½»³É¼¨
-			//²¹³ä£ºÖ´ĞĞÌá½»³É¼¨ÓÃÀı
+		if (e.getSource() == jb1) { // é€‰æ‹©æ‰§æ•™è¯¾ç¨‹åŠŸèƒ½
+			// è¡¥å……ï¼šæ‰§è¡Œé€‰æ‹©æ‰§æ•™è¯¾ç¨‹ç”¨ä¾‹
+		} else if (e.getSource() == jb2) { // æäº¤æˆç»©
+			// è¡¥å……ï¼šæ‰§è¡Œæäº¤æˆç»©ç”¨ä¾‹
+			try {
+				SubmitGradesUI ui = new SubmitGradesUI(user_id, password, socket);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			dispose();
 		}
 	}
 }

@@ -19,68 +19,178 @@ public class Professor {
 	String SSN;
 	String status;
 	String department;
-	
+
 	private Connection conn;
 	private PreparedStatement pst;
 	private ResultSet rs;
-	
+
 	Socket socket;
-    DataInputStream dis;
-    DataOutputStream dos;
+	DataInputStream dis;
+	DataOutputStream dos;
+
 	public Professor(Socket socket) {
 		id = null;
-		password=null;
-		name=null;
-		birthday=null;
-		SSN=null;
-		status=null;
-		department=null;
+		password = null;
+		name = null;
+		birthday = null;
+		SSN = null;
+		status = null;
+		department = null;
 		try {
-			this.dis = new DataInputStream(
-			        new BufferedInputStream(socket.getInputStream()));
-			this.dos = new DataOutputStream(
-	                new BufferedOutputStream(socket.getOutputStream()));//Êä³öÁ÷
+
+			this.dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+			this.dos = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));// è¾“å‡ºæµ
 			conn = Database.getNewConnection();
+			pst = null;
+			rs = null;
+
 		} catch (SQLException | IOException e) {
-			// TODO ×Ô¶¯Éú³ÉµÄ catch ¿é
+			// TODO è‡ªåŠ¨ç”Ÿæˆçš„ catch å—
 			e.printStackTrace();
 		}
 	}
-	public String login(String id,String pw) throws SQLException {
+
+	public String login(String id, String pw) throws SQLException {
 		/*
-		 * µ±·şÎñÆ÷½ÓÊÕµ½½ÌÊÚ¿Í»§¶Ë·¢À´µÄµÇÂ¼ÇëÇóºó£¬´´½¨½ÌÊÚ¶ÔÏó²¢Ö´ĞĞ´Ë·½·¨
-		 * 1.·ÃÎÊÊı¾İ¿â£¬¶ÔidÓëpw½øĞĞ¼ìË÷£¬Èô¼ìË÷²»µ½»ò²»Æ¥Åä£¬±¨´í£¬·µ»Ø0
-		 * 2.ÈôÆ¥Åä£¬Ôò¼ìË÷Êı¾İ¿â¸Ã½ÌÊÚµÄĞÅÏ¢£¬´æ·Åµ½±¾¶ÔÏóÖĞ£¬²¢·µ»Ø1±íÊ¾µÇÂ¼³É¹¦¡£
+		 * å½“æœåŠ¡å™¨æ¥æ”¶åˆ°æ•™æˆå®¢æˆ·ç«¯å‘æ¥çš„ç™»å½•è¯·æ±‚åï¼Œåˆ›å»ºæ•™æˆå¯¹è±¡å¹¶æ‰§è¡Œæ­¤æ–¹æ³• 1.è®¿é—®æ•°æ®åº“ï¼Œå¯¹idä¸pwè¿›è¡Œæ£€ç´¢ï¼Œè‹¥æ£€ç´¢ä¸åˆ°æˆ–ä¸åŒ¹é…ï¼ŒæŠ¥é”™ï¼Œè¿”å›0
+		 * 2.è‹¥åŒ¹é…ï¼Œåˆ™æ£€ç´¢æ•°æ®åº“è¯¥æ•™æˆçš„ä¿¡æ¯ï¼Œå­˜æ”¾åˆ°æœ¬å¯¹è±¡ä¸­ï¼Œå¹¶è¿”å›1è¡¨ç¤ºç™»å½•æˆåŠŸã€‚
 		 */
-		//²¹³ä£º¶ÔÊı¾İ¿â½øĞĞ¼ìË÷
-		
+		// è¡¥å……ï¼šå¯¹æ•°æ®åº“è¿›è¡Œæ£€ç´¢
+
+		this.id = id;
+		this.password = pw;
 		String sql;
 		sql = "select pid,password from professor where pid=?";
-		pst=conn.prepareStatement(sql);
+		pst = conn.prepareStatement(sql);
 		pst.setString(1, id);
 		rs = pst.executeQuery();
 		rs.next();
-		String testidString=rs.getString("pid");
-		String testpwString=rs.getString("password");
-		boolean flag=false;
-		if(id.equals(testidString)&&pw.equals(testpwString)) {flag=true;}
-		else {flag=false;}
-		if(flag) {
+		String testidString = rs.getString("pid");
+		String testpwString = rs.getString("password");
+		boolean flag = false;
+		if (id.equals(testidString) && pw.equals(testpwString)) {
+			flag = true;
+		} else {
+			flag = false;
+		}
+		if (flag) {
 			return "1";
-		}else {
+		} else {
 			return "0";
 		}
 	}
-	
+
+	public void GetCourse() throws IOException { // è·å–æŒ‡å®šå­¦æœŸçš„è¯¾ç¨‹
+		String semester = dis.readUTF();
+		try {
+			String sql;
+			PreparedStatement pst;
+			if (semester.equals("-----è¯·é€‰æ‹©-----")) { // æ²¡æœ‰æŒ‡å®šå­¦æœŸæ—¶ï¼Œé»˜è®¤å…¨éƒ¨å­¦æœŸ
+				sql = "select distinct cname " + "from grade " + "where pid = ?";
+				pst = conn.prepareStatement(sql);
+				pst.setString(1, id);
+			} else {
+				sql = "select distinct cname " + "from grade " + "where semester= ? " + "and pid = ?";
+				pst = conn.prepareStatement(sql);
+				pst.setString(1, semester);
+				pst.setString(2, id);
+			}
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				dos.writeUTF(rs.getString("cname"));
+				// dos.flush();
+			}
+			dos.writeUTF("end");
+			dos.flush();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+
+	public void GetGrades() throws IOException { // è·å–æŒ‡å®šå­¦æœŸã€æŒ‡å®šè¯¾ç¨‹çš„å­¦ç”Ÿæˆç»©
+		String semester = dis.readUTF();
+		String course = dis.readUTF();
+		try {
+			String sql;
+			PreparedStatement pst;
+			if (course.equals("-----è¯·é€‰æ‹©-----")) {
+				if (semester.equals("-----è¯·é€‰æ‹©-----")) {// æ²¡æœ‰æŒ‡å®šå­¦æœŸå’Œè¯¾ç¨‹ï¼Œé»˜è®¤å…¨éƒ¨
+					sql = "select grade.sid,name,semester,cname,grade "
+							+ "from grade join student on grade.sid=student.sid " + "where pid = ?";
+					pst = conn.prepareStatement(sql);
+					pst.setString(1, id);
+				} else {// åªæŒ‡å®šäº†å­¦æœŸ
+					sql = "select grade.sid,name,semester,cname,grade "
+							+ "from grade join student on grade.sid=student.sid " + "where semester = ? and pid = ?";
+					pst = conn.prepareStatement(sql);
+					pst.setString(1, semester);
+					pst.setString(2, id);
+				}
+			} else {// æŒ‡å®šäº†å­¦æœŸå’Œè¯¾ç¨‹
+				sql = "select grade.sid,name,semester,cname,grade "
+						+ "from grade join student on grade.sid=student.sid "
+						+ "where semester = ? and cname = ? and pid = ? ";
+				pst = conn.prepareStatement(sql);
+				pst.setString(1, semester);
+				pst.setString(2, course);
+				pst.setString(3, id);
+			}
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				dos.writeUTF(rs.getString("sid"));
+				dos.writeUTF(rs.getString("name"));
+				dos.writeUTF(rs.getString("semester"));
+				dos.writeUTF(rs.getString("cname"));
+				dos.writeUTF(String.valueOf(rs.getInt("grade")));
+				dos.flush();
+			}
+			dos.writeUTF("end");
+			dos.flush();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+
+	public void SubmitGrades() throws IOException, SQLException { // æäº¤å­¦ç”Ÿæˆç»©
+		String str = dis.readUTF();
+		PreparedStatement pst = null;
+		int rs = 0;
+		String sql;
+		while (!str.equals("end")) {
+			String id = str;
+			str = dis.readUTF();
+			String course = str;
+			str = dis.readUTF();
+			int grade = 0;
+			if (str.equals("end")) // æˆç»©æ ¼å¼æœ‰è¯¯ï¼Œä¸­æ–­ä¼ è¾“
+				return;
+			if (!str.equals(""))
+				grade = Integer.valueOf(str);
+			str = dis.readUTF();
+			sql = "Update grade set grade= ? where sid = ? and cname = ? ";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, grade);
+			pst.setString(2, id);
+			pst.setString(3, course);
+			rs = pst.executeUpdate();
+		}
+	}
+
 	public void close() {
 		try {
-			rs.close();
-			pst.close();
+			if (rs != null) {
+				rs.close();
+			}
+			if (pst != null) {
+				pst.close();
+			}
 			conn.close();
 		} catch (SQLException e) {
-			// TODO ×Ô¶¯Éú³ÉµÄ catch ¿é
+			// TODO è‡ªåŠ¨ç”Ÿæˆçš„ catch å—
 			e.printStackTrace();
 		}
 	}
-	
+
 }
